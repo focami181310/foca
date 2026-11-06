@@ -1,16 +1,33 @@
-import os
 import logging
 import message_worker
 
+#Настройка логгера
+time_format = '%Y-%m-%d %H:%M:%S'
+
 logger = logging.getLogger(__name__)
+logging.basicConfig(filename='foca.log',
+                    level=logging.INFO,
+                    format='%(asctime)s – %(message)s',
+                    datefmt=time_format)
+
+username = "Фоками"
 
 def main():
-    logging.basicConfig(filename='foca.log', level=logging.INFO)
     logger.info('Starting Foca...')
 
-    response = message_worker.send_message("Фоками", "Привет!")
+    print("Мост: Мост был запущен. На другом конце Фока.")
+    response = message_worker.send_message("Мост", f"Мост был запущен. На другом конце {username}.")
+    print(f"\nФокалорс: {response.choices[0].message.content}\n")
 
-    print(response.choices[0].messege.content)
+    while True:
+        print("Фоками: ", end = '')
+        message = input()
+        
+        if message == "exit":
+            break
+
+        response = message_worker.send_message(username, message)
+        print(f"\nФокалорс: {response.choices[0].message.content}\n")
 
     logger.info('Stopping Foca...')
 

@@ -17,5 +17,5 @@ venv/
 .idea/
 
 dialog_history.json
-long_term_memory.json
+long_term_memory.md
 system_promt.json
