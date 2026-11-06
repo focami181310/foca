@@ -1,0 +1,21 @@
+# Секреты и настройки окружения
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Логи и личные переписки
+*.log
+
+# Файлы редакторов
+.vscode/
+.idea/
+
+dialog_history.json
+long_term_memory.json
+system_promt.json
