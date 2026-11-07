@@ -51,11 +51,11 @@ def get_current_time():
 
 #Отправка сообщения и получение ответа
 def send_message(name, content):
-    with open("C:\\Users\\focami\\Projects\\foca\\system_promt.json", 'r', encoding='utf-8') as f:
+    with open("system_promt.json", 'r', encoding='utf-8') as f:
         system_promt = json.load(f)
-    with open("C:\\Users\\focami\\Projects\\foca\\dialog_history.json", 'r', encoding='utf-8') as f:
-        dialog_history = json.load(f)
-    with open("C:\\Users\\focami\\Projects\\foca\\long_term_memory.md", 'r', encoding='utf-8') as f:
+    with open("chat_history.json", 'r', encoding='utf-8') as f:
+        chat_history = json.load(f)
+    with open("long_term_memory.md", 'r', encoding='utf-8') as f:
         long_term_memory = f.read()
 
     current_time = get_current_time()
@@ -65,7 +65,7 @@ def send_message(name, content):
             "role": "system",
             "content": long_term_memory
         }
-    ] + dialog_history + [
+    ] + chat_history + [
         {
             "role": "user", 
              "content": f"Текущее время: {current_time}\n{name}: {content}"
@@ -73,12 +73,22 @@ def send_message(name, content):
     ]
 
     try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens
-        )
+        if model == 'anthropic/claude-sonnet-5-5': 
+            logger.info(f"Основная LLM: {model}")
+            logger.info(f"Температура: {temperature}")
+            logger.info(f"Ограничение токенов: {max_tokens}")
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens
+            )
+        else: #универсальный промт для любой модели proxyapi
+            logger.info(f"Основная LLM: {model}")
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+            )
     except BadRequestError as e:
         logger.error("Ошибка API: %s", e)
         logger.error("Ответ сервера: %s", e.response.text)
@@ -86,17 +96,17 @@ def send_message(name, content):
 
     response_text = response.choices[0].message.content
 
-    dialog_history.append({
+    chat_history.append({
         "role": "user",
         "content": f"{current_time}\n{name}: {content}"
     })
 
-    dialog_history.append({
+    chat_history.append({
         "role": "assistant",
         "content": response_text
     })
 
-    with open("C:\\Users\\focami\\Projects\\foca\\dialog_history.json", 'w', encoding='utf-8') as f:   
-        json.dump(dialog_history, f, ensure_ascii=False, indent=4)
+    with open("chat_history.json", 'w', encoding='utf-8') as f:   
+        json.dump(chat_history, f, ensure_ascii=False, indent=4)
 
     return response

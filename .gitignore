@@ -16,6 +16,6 @@ venv/
 .vscode/
 .idea/
 
-dialog_history.json
+chat_history.json
 long_term_memory.md
 system_promt.json
