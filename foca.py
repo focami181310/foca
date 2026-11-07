@@ -1,5 +1,6 @@
 import logging
 import message_worker
+import voice_generator
 
 #Настройка логгера
 time_format = '%Y-%m-%d %H:%M:%S'
@@ -15,19 +16,28 @@ username = "Фоками"
 def main():
     logger.info('Starting Foca...')
 
+    print("Мост: Попытка запустить мост...")
+    response = message_worker.send_message("Мост", f"{username} инициализировал попытку запустить мост...")
+
     print("Мост: Мост был запущен. На другом конце Фока.")
-    response = message_worker.send_message("Мост", f"Мост был запущен. На другом конце {username}.")
-    print(f"\nФокалорс: {response.choices[0].message.content}\n")
+    first = True
 
     while True:
+        if not first:
+            response = message_worker.send_message(username, message)
+
+        audio_file = voice_generator.text_to_mp3_file(response.choices[0].message.content)
+        print(f"\nФокалорс: {response.choices[0].message.content}\n")
+        voice_generator.play_mp3(audio_file)
+
         print("Фоками: ", end = '')
         message = input()
+
+        first = False
         
         if message == "exit":
             break
 
-        response = message_worker.send_message(username, message)
-        print(f"\nФокалорс: {response.choices[0].message.content}\n")
 
     logger.info('Stopping Foca...')
 

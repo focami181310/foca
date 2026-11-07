@@ -3,6 +3,7 @@ import logging
 import os
 from datetime import datetime
 from openai import BadRequestError
+from dotenv import load_dotenv
 
 #Настройка логгера
 time_format = '%Y-%m-%d %H:%M:%S'
@@ -14,12 +15,10 @@ logging.basicConfig(filename='foca.log',
                     datefmt=time_format)
 
 #Загрузка окружения .env. Получение ключа и модели из env
-from dotenv import load_dotenv
-
 load_dotenv()
 
-openai_api_key = os.getenv("OPENAI_API_KEY")
-base_url = os.getenv("OPENAI_BASE_URL")
+openai_api_key = os.getenv("LLM_OPENAI_API_KEY")
+base_url = os.getenv("LLM_OPENAI_BASE_URL")
 model = os.getenv("LLM_MODEL")
 
 temperature = os.getenv("LLM_TEMPERATURE")
@@ -29,7 +28,7 @@ if temperature is None or temperature == '':
     temperature = "0.8"
 temperature = float(temperature)
 
-max_tokens = os.getenv("MAX_TOKENS")
+max_tokens = os.getenv("LLM_MAX_TOKENS")
 if max_tokens is None or max_tokens == '':
     logger.warning("Не задана max_tokens для LLM. По умолчанию (300)")
     print("Предупреждение: Не задана max_tokens для LLM в файле .env! Установлено значение по умолчанию (300)")
