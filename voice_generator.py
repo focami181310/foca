@@ -3,6 +3,17 @@ import os
 import pygame
 from dotenv import load_dotenv
 import time
+import crush_check
+import logging
+
+#Настройка логгера
+time_format = '%Y-%m-%d %H:%M:%S'
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='foca.log',
+                    level=logging.INFO,
+                    format='%(asctime)s – %(message)s',
+                    datefmt=time_format)
 
 #загрузка параметров из .env
 load_dotenv()
@@ -30,12 +41,17 @@ def text_to_mp3_file(text):
     return file_path
 
 def play_mp3(audio_file):
-    pygame.init()
-    pygame.mixer.init()
-    pygame.mixer.music.load(audio_file)
-    pygame.mixer.music.play()
+    try:
+        pygame.init()
+        pygame.mixer.init()
+        pygame.mixer.music.load(audio_file)
+        pygame.mixer.music.play()
 
-    while pygame.mixer.music.get_busy():
-        pygame.time.Clock().tick(10)
+        while pygame.mixer.music.get_busy():
+            pygame.time.Clock().tick(10)
 
-    pygame.mixer.music.unload()
+        pygame.mixer.music.unload()
+    except Exception as e:
+        logger.error(f"failed in voice_generator.py. In play_mp3(audio_file)")
+        crush_check.create_crash_marker(__name__, "play_mp3(audio_file)")
+    

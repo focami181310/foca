@@ -73,9 +73,9 @@ def send_message(name, content):
 
     try:
         if model == 'anthropic/claude-sonnet-5-5': 
-            logger.info(f"Основная LLM: {model}")
-            logger.info(f"Температура: {temperature}")
-            logger.info(f"Ограничение токенов: {max_tokens}")
+            logger.info(f"Main LLM: {model}")
+            logger.info(f"Temperature: {temperature}")
+            logger.info(f"Max tokens: {max_tokens}")
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
@@ -83,14 +83,14 @@ def send_message(name, content):
                 max_tokens=max_tokens
             )
         else: #универсальный промт для любой модели proxyapi
-            logger.info(f"Основная LLM: {model}")
+            logger.info(f"Main LLM: {model}")
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
             )
     except BadRequestError as e:
-        logger.error("Ошибка API: %s", e)
-        logger.error("Ответ сервера: %s", e.response.text)
+        logger.error("Error API: %s", e)
+        logger.error("Error of server: %s", e.response.text)
         raise
 
     response_text = response.choices[0].message.content
