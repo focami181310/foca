@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 import crash_check
 from datetime import datetime
+from memory.summarizer import summarize
 
 #Настройка логгера
 time_format = '%Y-%m-%d %H:%M:%S'
@@ -44,6 +45,12 @@ def main():
     first = True
 
     while True:
+        summarize_res = summarize()
+        if summarize_res == "summarized":
+            message_worker.add_message("user", "Уведомление", "Память обновлена")
+            print("Уведомление: Память обновлена")
+        logger.info(summarize_res)
+        
         if message != '':
             response = message_worker.send_message(user_name, message)
         else:
@@ -61,7 +68,7 @@ def main():
         message = input()
 
         first = False
-        
+
         if message == "exit":
             crash_check.remove_crash_marker()
             break

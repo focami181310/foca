@@ -4,7 +4,8 @@ import os
 import foca_utils
 from openai import BadRequestError
 from dotenv import load_dotenv
-from pathlib import Path
+from constants import MEMORY_FILES_DIR
+#import pathlib - попробуй разкомментировать, если будут проблемы
 
 #Настройка логгера
 time_format = '%Y-%m-%d %H:%M:%S'
@@ -32,11 +33,11 @@ client = OpenAI(
 
 )
 
-memory_dir = Path("memory")
+MEMORY_FILES_DIR.mkdir(parents=True, exist_ok=True)
 
 #Функция добавления сообщения без отправки
 def add_message(role, name, content):
-    chat_history = json.loads(memory_dir.joinpath("chat_history.json").read_text(encoding="utf-8"))
+    chat_history = json.loads(MEMORY_FILES_DIR.joinpath("chat_history.json").read_text(encoding="utf-8"))
 
     current_time = foca_utils.get_current_time()
 
@@ -47,16 +48,16 @@ def add_message(role, name, content):
 
     chat_history_json = json.dumps(chat_history, ensure_ascii=False, indent=4)
 
-    (memory_dir / "chat_history.json").write_text(chat_history_json, encoding="utf-8")
+    (MEMORY_FILES_DIR / "chat_history.json").write_text(chat_history_json, encoding="utf-8")
 
 
 #Отправка сообщения и получение ответа
 def send_message(name, content):
-    system_prompt = json.loads(memory_dir.joinpath("system_promt.json").read_text(encoding="utf-8"))
-    chat_history = json.loads(memory_dir.joinpath("chat_history.json").read_text(encoding="utf-8"))
+    system_prompt = json.loads(MEMORY_FILES_DIR.joinpath("system_prompt.json").read_text(encoding="utf-8"))
+    chat_history = json.loads(MEMORY_FILES_DIR.joinpath("chat_history.json").read_text(encoding="utf-8"))
 
     # Читаем обычный текстовый файл
-    long_term_memory = memory_dir.joinpath("long_term_memory.md").read_text(encoding="utf-8")
+    long_term_memory = MEMORY_FILES_DIR.joinpath("long_term_memory.md").read_text(encoding="utf-8")
 
     current_time = foca_utils.get_current_time()
 
@@ -114,6 +115,6 @@ def send_message(name, content):
 
     chat_history_json = json.dumps(chat_history, ensure_ascii=False, indent=4)
 
-    (memory_dir / "chat_history.json").write_text(chat_history_json, encoding="utf-8")
+    (MEMORY_FILES_DIR / "chat_history.json").write_text(chat_history_json, encoding="utf-8")
 
     return response
