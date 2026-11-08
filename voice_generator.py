@@ -3,7 +3,6 @@ import os
 import pygame
 from dotenv import load_dotenv
 import time
-import crash_check
 import logging
 
 #Настройка логгера
@@ -31,7 +30,7 @@ def text_to_mp3_file(text):
         voice=voice,
     )
 
-    file_path = f"speech_{int(time.time())}.mp3"
+    file_path = f"cache/speeches/speech_{int(time.time())}.mp3"
 
     speech.write_to_file(file_path)
     return file_path

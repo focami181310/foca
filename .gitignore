@@ -23,3 +23,6 @@ chat_archive.json
 
 #временные файлы
 *.mp3
+
+#недоделанные
+env_check.py
