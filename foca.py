@@ -3,7 +3,8 @@ import message_worker
 import voice_generator
 from dotenv import load_dotenv
 import os
-import crush_check
+import crash_check
+from datetime import datetime
 
 #Настройка логгера
 time_format = '%Y-%m-%d %H:%M:%S'
@@ -16,31 +17,37 @@ logging.basicConfig(filename='foca.log',
 
 load_dotenv()
 
-username = os.getenv("USERNAME")
-NORMAL_MESSAGE = f"{username} инициализировал попытку запустить мост..."
-CRUSH_MESSAGE = f"{username} инициализировал попытку запустить мост... Прошлая попытка не удалась..."
+user_name = os.getenv("USER_NAME")
+NORMAL_MESSAGE = f"{user_name} инициализировал попытку запустить мост..."
+CRASH_MESSAGE = f"{user_name} инициализировал попытку запустить мост... Прошлая попытка не удалась..."
 SKIP = "[пропуск]"
 
 
 def main():
     logger.info('Starting Foca...')
 
-    check = crush_check.previous_run_crushed()
+    print(f"{user_name}: ", end='')
+
+    #init message
+    message = input()
+
+    check = crash_check.previous_run_crashed()
+    crash_check.create_crash_marker()
 
     if check:
         print("Мост: Попытка запустить мост... Прошлая попытка не удалась...")
-        response = message_worker.send_message("Мост", CRUSH_MESSAGE)
+        message_worker.add_message("user", "Мост", CRASH_MESSAGE)
     else:
         print("Мост: Попытка запустить мост...")
-        response = message_worker.send_message("Мост", NORMAL_MESSAGE)
+        response = message_worker.add_message("user", "Мост", NORMAL_MESSAGE)
 
     first = True
 
     while True:
-        if not first:
-            response = message_worker.send_message(username, message)
+        if message != '':
+            response = message_worker.send_message(user_name, message)
         else:
-            print("\nМост: Мост был запущен. На другом конце Фока.\n")
+            response = message_worker.send_message(user_name, None)
 
         if not response.choices[0].message.content == SKIP:
             audio_file = voice_generator.text_to_mp3_file(response.choices[0].message.content)
@@ -56,7 +63,7 @@ def main():
         first = False
         
         if message == "exit":
-            crush_check.remove_crash_marker()
+            crash_check.remove_crash_marker()
             break
 
 
