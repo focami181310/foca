@@ -16,13 +16,15 @@ venv/
 .vscode/
 .idea/
 
-chat_history.json
-long_term_memory.md
-system_promt.json
-chat_archive.json
+# конфиденциальные файлы
+data/memory/backups
+data/memory/chat_history.json
+data/memory/long_term_memory.md
+data/memory/system_prompt.json
 
 #временные файлы
 *.mp3
+*.wav
 
 #недоделанные
 env_check.py
