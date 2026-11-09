@@ -1,10 +1,13 @@
 from openai import OpenAI
 import os
 from constants import DATA_DIR
+import logging
 
-openai_api_key = os.getenv("TTS_OPENAI_API_KEY")
-base_url = os.getenv("TTS_OPENAI_BASE_URL")
-model = os.getenv("TTS_MODEL")
+logger = logging.getLogger(__name__)
+
+openai_api_key = os.getenv("STT_OPENAI_API_KEY")
+base_url = os.getenv("STT_OPENAI_BASE_URL")
+model = os.getenv("STT_MODEL")
 
 client = OpenAI(
     api_key=openai_api_key,
@@ -12,12 +15,12 @@ client = OpenAI(
 )
 
 def speech_to_text(audio_file):
-    print("stt start")
+    logger.info("stt start")
     with open(DATA_DIR / "mic_audio" / audio_file, "rb") as audio:
         transcript = client.audio.transcriptions.create(
-            model="openai/whisper-large-v3-turbo",
+            model=model,
             file=audio,
             language="ru"
         )
-    print("stt complete")
+    logger.info("stt complete")
     return transcript.text

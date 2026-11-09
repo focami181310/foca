@@ -46,7 +46,8 @@ def add_message(role, name, content):
 
     chat_history.append({
         "role": role,
-        "content": f"{current_time}\n{name}: {content}"
+        "name": name,
+        "content": f"[{current_time}] - {content}"
     })
 
     chat_history_json = json.dumps(chat_history, ensure_ascii=False, indent=4)

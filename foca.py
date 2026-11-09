@@ -6,6 +6,7 @@ import os
 import crash_check
 from datetime import datetime
 from memory.summarizer import summarize
+from speech_to_text.voice_text import get_voice_text
 
 #Настройка логгера
 time_format = '%Y-%m-%d %H:%M:%S'
@@ -53,11 +54,13 @@ def main():
             message_worker.add_message("user", "Уведомление", "Память обновлена")
             print("Уведомление: Память обновлена")
         logger.info(summarize_res)
-        
-        if message != '':
-            response = message_worker.send_message(user_name, message)
-        else:
+
+        if message == '':
             response = message_worker.send_message(user_name, None)
+        elif message == '/v':
+            response = message_worker.send_message(user_name, "[Голосовое сообщение]" + get_voice_text())
+        else:
+            response = message_worker.send_message(user_name, message)
 
         if not response.choices[0].message.content == SKIP and not mute_state:
             audio_file = voice_generator.text_to_mp3_file(response.choices[0].message.content)
