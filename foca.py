@@ -26,11 +26,14 @@ SKIP = "[пропуск]"
 
 def main():
     logger.info('Starting Foca...')
+    mute_state = False
 
     print(f"{user_name}: ", end='')
 
     #init message
     message = input()
+    if "/mute @foca" in message:
+        mute_state = True
 
     check = crash_check.previous_run_crashed()
     crash_check.create_crash_marker()
@@ -56,16 +59,20 @@ def main():
         else:
             response = message_worker.send_message(user_name, None)
 
-        if not response.choices[0].message.content == SKIP:
+        if not response.choices[0].message.content == SKIP and not mute_state:
             audio_file = voice_generator.text_to_mp3_file(response.choices[0].message.content)
 
         print(f"\nФокалорс: {response.choices[0].message.content}\n")
 
-        if not response.choices[0].message.content == SKIP:
+        if not response.choices[0].message.content == SKIP and not mute_state:
             voice_generator.play_mp3(audio_file)
 
         print("Фоками: ", end = '')
         message = input()
+        if "/mute @foca" in message:
+            mute_state = True
+        elif "/unmute @foca" in message:
+            mute_state = False
 
         first = False
 
