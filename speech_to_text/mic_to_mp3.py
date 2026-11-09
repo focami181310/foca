@@ -3,6 +3,9 @@ import time
 from scipy.io.wavfile import write
 import sounddevice as sd
 from constants import DATA_DIR
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 1. Прописываем путь к FFmpeg в PATH до импорта pydub (убирает RuntimeWarning)
 ffmpeg_path = r"C:\ffmpeg\bin"
@@ -19,10 +22,13 @@ seconds = 5  # Длительность записи в секундах
 
 def start_recording():
     print("Запись началась...")
+    logger.info("Запись началась...")
+
     # Запись с микрофона
     myrecording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
     sd.wait()  # Ожидание окончания записи
     print("Запись завершена.")
+    logger.info("Запись завершена.")
 
     # Временный WAV-файл
     wav_filename = "temp_audio.wav"
@@ -41,6 +47,5 @@ def start_recording():
 
     # Удаляем временный WAV-файл
     os.remove(wav_filename)
-
-    print(f"Файл сохранен")
+    logger.info("Аудиофайл пользователя сохранён")
     return mp3_filename

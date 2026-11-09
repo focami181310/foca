@@ -36,7 +36,8 @@ def summarize():
     summarizer_system_prompt = json.loads(MEMORY_FILES_DIR.joinpath("summarizer_prompt.json").read_text(encoding="utf-8"))
     chat_history = json.loads(MEMORY_FILES_DIR.joinpath("chat_history.json").read_text(encoding="utf-8"))
     if len(chat_history) <= MAX_MESSAGES:
-        return "not enough history"
+        return f"{MAX_MESSAGES - len(chat_history)} before summarizing"
+    logger.info("Starting summarizing")
     long_term_memory = MEMORY_FILES_DIR.joinpath("long_term_memory.md").read_text(encoding="utf-8")
 
     combined_system_content = f"{summarizer_system_prompt}\n\n[ДОЛГОВРЕМЕННАЯ ПАМЯТЬ]\n{long_term_memory}\n\n[ПОСЛЕДНЯЯ ИСТОРИЯ ЧАТА]\n{chat_history}"
@@ -47,9 +48,9 @@ def summarize():
             "content": combined_system_content
         }
     ]
+    logger.info(f"Summarizing using LLM: {model}")
 
     try:
-        logger.info(f"Main LLM: {model}")
         response = client.chat.completions.create(
             model=model,
             messages=messages

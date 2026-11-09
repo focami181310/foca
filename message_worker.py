@@ -23,10 +23,12 @@ base_url = os.getenv("LLM_OPENAI_BASE_URL")
 model = os.getenv("LLM_MODEL")
 
 temperature = os.getenv("LLM_TEMPERATURE")
-temperature = float(temperature)
+if temperature:
+    temperature = float(temperature)
 
 max_tokens = os.getenv("LLM_MAX_TOKENS")
-max_tokens = int(max_tokens)
+if max_tokens:
+    max_tokens = int(max_tokens)
 
 #Подключение к провайдеру LLM
 from openai import OpenAI

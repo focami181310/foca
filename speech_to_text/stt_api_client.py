@@ -16,7 +16,7 @@ client = OpenAI(
 
 def speech_to_text(audio_file):
     logger.info("stt start")
-    with open(DATA_DIR / "mic_audio" / audio_file, "rb") as audio:
+    with open(audio_file, "rb") as audio:
         transcript = client.audio.transcriptions.create(
             model=model,
             file=audio,
