@@ -25,6 +25,7 @@ data/memory/system_prompt.json
 #временные файлы
 *.mp3
 *.wav
+last_run_failed.marker
 
 #недоделанные
 env_check.py
