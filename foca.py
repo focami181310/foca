@@ -7,15 +7,19 @@ import crash_check
 from datetime import datetime
 from memory.summarizer import summarize
 from speech_to_text.voice_text import get_voice_text
-
-#Настройка логгера
-time_format = '%Y-%m-%d %H:%M:%S'
+from logging.handlers import RotatingFileHandler
+from vision import img_in_message
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(filename='foca.log',
-                    level=logging.INFO,
-                    format='%(asctime)s – %(message)s',
-                    datefmt=time_format)
+logger.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+handler = RotatingFileHandler('foca.log', maxBytes=2 * 1024 * 1024, backupCount=5, encoding='utf-8')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+
+
 
 load_dotenv()
 
@@ -29,13 +33,6 @@ def main():
     logger.info('Starting Foca...')
     mute_state = False
 
-    print(f"{user_name}: ", end='')
-
-    #init message
-    message = input()
-    if "/mute @foca" in message:
-        mute_state = True
-
     check = crash_check.previous_run_crashed()
     crash_check.create_crash_marker()
 
@@ -46,19 +43,30 @@ def main():
         print("Мост: Попытка запустить мост...")
         response = message_worker.add_message("user", "Мост", NORMAL_MESSAGE)
 
-    first = True
-
     while True:
-        summarize_res = summarize()
-        if summarize_res == "summarized":
-            message_worker.add_message("user", "Уведомление", "Память обновлена")
-            print("Уведомление: Память обновлена")
-        logger.info(summarize_res)
+        print(f"{user_name}: ", end='')
+
+        message = input()
+        if "/mute @foca" in message:
+            mute_state = True
+        elif "/unmute @foca" in message:
+            mute_state = False
 
         if message == '':
             response = message_worker.send_message(user_name, None)
         elif message == '/v':
-            response = message_worker.send_message(user_name, "[Голосовое сообщение]" + get_voice_text())
+            message = "[Голосовое сообщение]" + get_voice_text()
+            print(f"{user_name}: {message}")
+            response = message_worker.send_message(user_name, message)
+        elif message == "/exit":
+            message_worker.add_message("user", "Мост", "Мост разорван пользователем")
+            crash_check.remove_crash_marker()
+            break
+        elif message == "/i":
+            img_text = input()
+            img_path = input()
+            img_in_message.add_img("user",user_name,img_text,img_path)
+            response = message_worker.send_message(user_name, None)
         else:
             response = message_worker.send_message(user_name, message)
 
@@ -70,18 +78,11 @@ def main():
         if not response.choices[0].message.content == SKIP and not mute_state:
             voice_generator.play_mp3(audio_file)
 
-        print("Фоками: ", end = '')
-        message = input()
-        if "/mute @foca" in message:
-            mute_state = True
-        elif "/unmute @foca" in message:
-            mute_state = False
-
-        first = False
-
-        if message == "exit":
-            crash_check.remove_crash_marker()
-            break
+        summarize_res = summarize()
+        if summarize_res == "summarized":
+            message_worker.add_message("user", "Уведомление", "Память обновлена")
+            print("Уведомление: Память обновлена")
+        logger.info(summarize_res)
 
 
     logger.info('Stopping Foca...')
