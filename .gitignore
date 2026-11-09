@@ -26,6 +26,10 @@ data/memory/system_prompt.json
 *.mp3
 *.wav
 last_run_failed.marker
+*.webp
+*.png
+*.jpeg
+*.jpg
 
 #недоделанные
 env_check.py
