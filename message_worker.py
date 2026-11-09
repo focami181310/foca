@@ -1,11 +1,14 @@
 import json
 import logging
 import os
-import foca_utils
 from openai import BadRequestError
 from dotenv import load_dotenv
 from constants import MEMORY_FILES_DIR
-#import pathlib - попробуй разкомментировать, если будут проблемы
+from datetime import datetime
+
+def get_current_time():
+    current_time = datetime.now()
+    return current_time.strftime("%d.%m.%Y %H:%M:%S")
 
 #Настройка логгера
 time_format = '%Y-%m-%d %H:%M:%S'
@@ -39,7 +42,7 @@ MEMORY_FILES_DIR.mkdir(parents=True, exist_ok=True)
 def add_message(role, name, content):
     chat_history = json.loads(MEMORY_FILES_DIR.joinpath("chat_history.json").read_text(encoding="utf-8"))
 
-    current_time = foca_utils.get_current_time()
+    current_time = get_current_time()
 
     chat_history.append({
         "role": role,
@@ -59,7 +62,7 @@ def send_message(name, content):
     # Читаем обычный текстовый файл
     long_term_memory = MEMORY_FILES_DIR.joinpath("long_term_memory.md").read_text(encoding="utf-8")
 
-    current_time = foca_utils.get_current_time()
+    current_time = get_current_time()
 
     combined_system_content = f"{system_prompt}\n\n[ДОЛГОВРЕМЕННАЯ ПАМЯТЬ]\n{long_term_memory}\n\n[ТЕКУЩЕЕ ВРЕМЯ]: {current_time}"
 
