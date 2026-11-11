@@ -18,8 +18,8 @@ client = OpenAI(
     base_url=base_url,
 )
 
-MAX_MESSAGES = 40
-KEEP_MESSAGES = 20
+MAX_MESSAGES = int(os.getenv("MAX_MESSAGES"))
+KEEP_MESSAGES = int(os.getenv("KEEP_MESSAGES"))
 
 def trim_history(messages):
     if len(messages) > MAX_MESSAGES:
@@ -29,14 +29,16 @@ def trim_history(messages):
     return messages
 
 def summarize():
-    memory_backup_res = memory_backup()
-    if memory_backup_res:
-        return memory_backup_res
-
     summarizer_system_prompt = json.loads(MEMORY_FILES_DIR.joinpath("summarizer_prompt.json").read_text(encoding="utf-8"))
     chat_history = json.loads(MEMORY_FILES_DIR.joinpath("chat_history.json").read_text(encoding="utf-8"))
     if len(chat_history) <= MAX_MESSAGES:
         return f"{MAX_MESSAGES - len(chat_history)} before summarizing"
+
+    #делаем bachup памяти перед перезаписью
+    memory_backup_res = memory_backup()
+    if memory_backup_res:
+        return memory_backup_res
+    print("Уведомление: Память начинает обновляться... Пожалуйста, подождите...")
     logger.info("Starting summarizing")
     long_term_memory = MEMORY_FILES_DIR.joinpath("long_term_memory.md").read_text(encoding="utf-8")
 

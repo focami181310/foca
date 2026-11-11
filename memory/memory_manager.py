@@ -25,17 +25,17 @@ def memory_files_check():
     return 0
 
 def memory_backup_check(time):
-    if not Path.exists(MEMORY_BACKUP_DIR / time / "system_prompt.json"):
+    if not Path.exists(MEMORY_BACKUP_DIR / time / "data" / "memory" / "system_prompt.json"):
         logger.error("system_prompt.json BACKUP does not exist!")
         print("ERROR: system_prompt.json BACKUP does not exist!")
         return "system_prompt.json BACKUP does not exist!"
 
-    if not Path.exists(MEMORY_BACKUP_DIR / time / "chat_history.json"):
+    if not Path.exists(MEMORY_BACKUP_DIR / time / "data" / "memory" / "chat_history.json"):
         logger.error("chat_history.json BACKUP does not exist!")
         print("ERROR: chat_history.json BACKUP does not exist!")
         return "chat_history.json BACKUP does not exist!"
     
-    if not Path.exists(MEMORY_BACKUP_DIR/ time / "long_term_memory.md"):
+    if not Path.exists(MEMORY_BACKUP_DIR/ time / "data" / "memory" / "long_term_memory.md"):
         logger.error("long_term_memory.md BACKUP does not exist!")
         print("ERROR: long_term_memory.md BACKUP does not exist!")
         return "long_term_memory.md BACKUP does not exist!"
@@ -54,7 +54,7 @@ def memory_backup():
 
     current_time = get_current_time()
     
-    backup_path = MEMORY_BACKUP_DIR / current_time
+    backup_path = MEMORY_BACKUP_DIR / current_time / "data" / "memory"
     backup_path.mkdir(parents=True, exist_ok=True)
 
     shutil.copy(MEMORY_FILES_DIR/"system_prompt.json", backup_path/"system_prompt.json")

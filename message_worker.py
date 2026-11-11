@@ -30,6 +30,8 @@ max_tokens = os.getenv("LLM_MAX_TOKENS")
 if max_tokens:
     max_tokens = int(max_tokens)
 
+deepseek_thinking = os.getenv("DEEPSEEK_THINKING")
+
 #Подключение к провайдеру LLM
 from openai import OpenAI
 client = OpenAI(
@@ -97,16 +99,18 @@ def send_message(name, content):
         ] + chat_history
 
     try:
-        if model == "deepseek/deepseek-v4.1-flash-1017":
-            logger.info(f"Main LLM: {model}")
+        logger.info(f"Main LLM: {model}")
+        if "deepseek" in model:
             response = client.chat.completions.create(
                 model=model,
                 messages=messages,
-                extra_body={"thinking": {"type": "disabled"}},
+                extra_body={"thinking": {"type": deepseek_thinking}},
             )
         else:
-            logger.error("Поддерживается только deepseek/deepseek-v4.1-flash-1017")
-            return None
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages
+            )
     except BadRequestError as e:
         logger.error("Error API: %s", e)
         logger.error("Error of server: %s", e.response.text)

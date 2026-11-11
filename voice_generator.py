@@ -4,7 +4,7 @@ import pygame
 from dotenv import load_dotenv
 import time
 import logging
-from constants import DATA_DIR
+from constants import CACHE_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ def text_to_mp3_file(text):
         voice=voice,
     )
 
-    file_path = DATA_DIR / "speeches" / f"speech_{int(time.time())}.mp3"
+    file_path = CACHE_DIR / "speeches" / f"speech_{int(time.time())}.mp3"
 
     speech.write_to_file(file_path)
     return file_path
