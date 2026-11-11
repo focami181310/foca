@@ -33,3 +33,6 @@ last_run_failed.marker
 
 #недоделанные
 env_check.py
+
+#logo
+!logo.png

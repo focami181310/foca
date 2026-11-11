@@ -7,17 +7,15 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# 1. Прописываем путь к FFmpeg в PATH до импорта pydub (убирает RuntimeWarning)
-ffmpeg_path = r"C:\ffmpeg\bin"
-if ffmpeg_path not in os.environ["PATH"]:
+ffmpeg_path = os.getenv("FFMPEG_PATH")
+
+if ffmpeg_path and ffmpeg_path not in os.environ["PATH"]:
     os.environ["PATH"] += os.pathsep + ffmpeg_path
 
-# 2. Теперь импортируем pydub — предупреждения больше не будет
 from pydub import AudioSegment
 
-# Параметры записи
-fs = 44100  # Частота дискретизации (44.1 кГц)
-seconds = 5  # Длительность записи в секундах
+fs = 44100
+seconds = 5
 
 
 def start_recording():
