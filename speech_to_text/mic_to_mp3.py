@@ -2,7 +2,7 @@ import os
 import time
 from scipy.io.wavfile import write
 import sounddevice as sd
-from constants import DATA_DIR
+from constants import CACHE_DIR
 import logging
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,7 @@ def start_recording():
     wav_filename = "temp_audio.wav"
 
     # Формируем путь к MP3 и создаем папки, если их нет
-    output_dir = DATA_DIR / "mic_audio"
+    output_dir = CACHE_DIR / "mic_audio"
     output_dir.mkdir(parents=True, exist_ok=True)
     mp3_filename = output_dir / f"recording{int(time.time())}.mp3"
 

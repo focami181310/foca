@@ -27,7 +27,8 @@ def text_to_mp3_file(text):
         input=text,
         voice=voice,
     )
-
+    file_dir_path = CACHE_DIR / "speeches"
+    file_dir_path.mkdir(parents=True, exist_ok=True)
     file_path = CACHE_DIR / "speeches" / f"speech_{int(time.time())}.mp3"
 
     speech.write_to_file(file_path)
