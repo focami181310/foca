@@ -1,1 +1,1 @@
-pip install openai python-dotenv pygame pydub sounddevice scipy
+pip install openai python-dotenv pygame pydub sounddevice scipy audioop-lts
