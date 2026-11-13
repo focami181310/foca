@@ -33,7 +33,7 @@ cd foca
 uv venv .venv
 ```
 ```
-uv pip install --python .venv/bin/python openai python-dotenv pygame pydub sounddevice scipy audioop-lts
+uv pip install -r requirements.txt
 ```
 
 6. Rename .env.example to .env and fill it
