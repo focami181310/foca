@@ -1,14 +1,15 @@
 import logging
-import message_worker
-import voice_generator
+import message_worker as mw
+import voice_generator as vg
 from dotenv import load_dotenv
 import os
-import crash_check
+import crash_check as cr
 from datetime import datetime
 from memory.summarizer import summarize
 from speech_to_text.voice_text import get_voice_text
 from logging.handlers import RotatingFileHandler
 from vision import img_in_message
+import command_manager as cm
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -33,57 +34,48 @@ def main():
     logger.info('Starting Foca...')
     mute_state = False
 
-    check = crash_check.previous_run_crashed()
-    crash_check.create_crash_marker()
+    check = cr.previous_run_crashed()
+    cr.create_crash_marker()
 
     if check:
         print("Мост: Попытка запустить мост... Прошлая попытка не удалась...")
-        message_worker.add_message("user", "Мост", CRASH_MESSAGE)
+        mw.add_message("user", "Мост", CRASH_MESSAGE)
     else:
         print("Мост: Попытка запустить мост...")
-        response = message_worker.add_message("user", "Мост", NORMAL_MESSAGE)
-
+        response = mw.add_message("user", "Мост", NORMAL_MESSAGE)
+    
     while True:
         print(f"{user_name}: ", end='')
 
         message = input()
         if "/mute @foca" in message:
             mute_state = True
+            print("Foca was muted")
+            continue
         elif "/unmute @foca" in message:
             mute_state = False
-
-        if message == '':
-            response = message_worker.send_message(user_name, None)
-        elif message == '/v':
-            message = "[Голосовое сообщение]" + get_voice_text()
-            print(f"{user_name}: {message}")
-            response = message_worker.send_message(user_name, message)
-        elif message == "/exit":
-            message_worker.add_message("user", "Мост", "Мост разорван пользователем")
-            crash_check.remove_crash_marker()
-            break
-        elif message == "/i":
-            img_text = input()
-            img_path = input()
-            img_in_message.add_img("user",user_name,img_text,img_path)
-            response = message_worker.send_message(user_name, None)
+            print("Foca was unmuted")
+            continue
+        
+        if message in cm.COMMANDS:
+            response_text = cm.COMMANDS[message]()
         else:
-            response = message_worker.send_message(user_name, message)
+            mw.add_message("user", user_name, message)
+            response_text = mw.send_message()
 
-        if not response.choices[0].message.content == SKIP and not mute_state:
-            audio_file = voice_generator.text_to_mp3_file(response.choices[0].message.content)
+        if response_text != SKIP and not mute_state:
+            audio_file = vg.text_to_mp3_file(response_text)
 
-        print(f"\nФокалорс: {response.choices[0].message.content}\n")
+        print(f"\nFoca: {response_text}\n")
 
-        if not response.choices[0].message.content == SKIP and not mute_state:
-            voice_generator.play_mp3(audio_file)
+        if response_text != SKIP and not mute_state:
+            vg.play_mp3(audio_file)
 
         summarize_res = summarize()
         if summarize_res == "summarized":
-            message_worker.add_message("user", "Уведомление", "Память обновлена")
-            print("Уведомление: Память обновлена")
+            mw.add_message("user", "Notification", "Memory was summarized")
+            print("Notification: Memory was summarized")
         logger.info(summarize_res)
-
 
     logger.info('Stopping Foca...')
 
