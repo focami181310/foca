@@ -59,6 +59,9 @@ def main():
         
         if message in cm.COMMANDS:
             response_text = cm.COMMANDS[message]()
+        elif message == "/exit":
+            mw.add_message("user", "Мост", f"{user_name} отключил мост")
+            break
         else:
             mw.add_message("user", user_name, message)
             response_text = mw.send_message()
@@ -76,7 +79,8 @@ def main():
             mw.add_message("user", "Notification", "Memory was summarized")
             print("Notification: Memory was summarized")
         logger.info(summarize_res)
-
+    
+    print("Мост: мост был отключен")
     logger.info('Stopping Foca...')
 
 
